@@ -34,11 +34,11 @@ let Score = 0 , MaxScore = 0;
 let GameTime = 0 , Second = 0;
 
 //KeyboardEvent
-jump = false;
+let jump = false;
 
 document.addEventListener("keydown" , function(e)
 {
-    if(e.key == " " && !GameOver && Player_OBJ.y >= 380) 
+    if(e.key == " " && !GameOver && Player_OBJ.y >= 379) 
     {
         jump = true;
     }
@@ -73,25 +73,27 @@ function update(Time)
     let deltatime = (Time - lastFrameTime) / 1000;
     lastFrameTime = Time;
     ctx.clearRect(0,0,can.width,can.height);
-    Second += deltatime;
-    if(Second > 1)
-    {
-        Second = 0;
-        GameTime += 1;
-    }
-    if(GameTime > 3)
-    {
-        GameTime = 0;
-        tree.speed += 100;
-    }
 
     Drawing();
 
     DrawText("Score : " + Math.floor(Score) , 10 , 40 , "30px" , "white");
-    if(MaxScore > 1) DrawText("Max Score : " + Math.floor(MaxScore) , 10 , 80 , "30px" , "white");
+    if(MaxScore > 0) DrawText("Max Score : " + Math.floor(MaxScore) , 10 , 80 , "30px" , "white");
 
     if(!GameOver)
     {
+        Second += deltatime;
+        if(Second > 1)
+        {
+            Second = 0;
+            GameTime += 1;
+        }
+
+        if(GameTime > 3)
+        {
+            GameTime = 0;
+            tree.speed += 100;
+        }
+
         Score += deltatime;
         for(let i = 0; i < tobj.length;i++) tobj[i].update(deltatime);
 
@@ -113,9 +115,12 @@ function reset()
 {
     if(Score > MaxScore) MaxScore = Score;
     Score = 0;
+    GameTime = 0;
+    Second = 0;
     Player_OBJ.y = 380;
     tree.x = 854;
-    tree.speed = 350;
+    tree.speed = 400;
+    jump = false;
 
     GameOver = false;
 }
@@ -145,7 +150,16 @@ function PlayerJump(DeltaTime)
     if(jump)
     {
         Player_OBJ.y -= 380 * DeltaTime;
-        if(Player_OBJ.y <= 230) jump = false;
+        if(Player_OBJ.y <= 230) 
+        {
+            Player_OBJ.y = 230
+            jump = false;
+        }
     }
-    if(Player_OBJ.y < 380 && !jump) Player_OBJ.y += 400 * DeltaTime;
+    else
+    {
+        Player_OBJ.y += 400 * DeltaTime;
+        if(Player_OBJ.y >= 380 && !jump) Player_OBJ.y = 380;
+    }
+    
 }
